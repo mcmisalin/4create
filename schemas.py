@@ -1,15 +1,16 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, ConfigDict
+from typing import List, Optional, ClassVar
+
+
 
 # Schema for Comment
 class CommentBase(BaseModel):
     id: int
-    comment_text: str
+    text: str
     post_id: int
     user_id: int
 
-    class Config:
-        from_attributes = True
+    config: ClassVar[ConfigDict] = ConfigDict(orm_mode=True)
         
 
 # Schema for Tag
@@ -17,8 +18,8 @@ class TagBase(BaseModel):
     id: int
     tag_name: str
 
-    class Config:
-        from_attributes = True
+    config: ClassVar[ConfigDict] = ConfigDict(orm_mode=True)
+
 
 class TagCreate(TagBase):
     pass
@@ -27,12 +28,12 @@ class TagCreate(TagBase):
 # Schema for Post
 class PostBase(BaseModel):
     id: int
-    post_text: str
+    text: str
     draft: bool
     tags: List[TagBase] = [] 
 
-    class Config:
-        from_attributes = True
+    config: ClassVar[ConfigDict] = ConfigDict(orm_mode=True)
+
 
 # Schema for User
 class UserBase(BaseModel):
@@ -41,8 +42,8 @@ class UserBase(BaseModel):
     posts: List[PostBase] = []  # To include posts
     comments: List[CommentBase] = []  # To include comments
 
-    class Config:
-        from_attributes = True
+    config: ClassVar[ConfigDict] = ConfigDict(orm_mode=True)
+
 
 class UserCreate(UserBase):
     pass
@@ -64,7 +65,10 @@ class TagOut(TagBase):
     posts: Optional[List[PostBase]] = []
 
 class PostCreate(PostBase):
+    text: str
+    draft: bool
     user_id: int
+    tag_ids: List[int]
 
 class PostOut(PostBase):
     user: Optional[UserBase]
@@ -75,7 +79,9 @@ class PostOut(PostBase):
 
 
 class CommentCreate(CommentBase):
-    pass
+    text: str
+    post_id: int
+    user_id: int
 
 class CommentOut(CommentBase):
     user: Optional[UserBase]

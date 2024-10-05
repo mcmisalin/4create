@@ -6,10 +6,9 @@ from models import Base
 import crud
 from contextlib import asynccontextmanager
 
-import schemas
+Base.metadata.drop_all(bind=engine)
 
 Base.metadata.create_all(bind=engine)
-app = FastAPI()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,7 +27,7 @@ def get_posts(
 ):
     include_list = include.split(",") if include else []
     posts = crud.get_posts(db=db, status=status, include=include_list)
-
+    
     if not posts:
         raise HTTPException(status_code=404, detail="Posts not found")
     return posts
